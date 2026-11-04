@@ -236,6 +236,7 @@ export default defineNuxtConfig({
     public: {
       dashboardLoginOnly: false,
       uploadPrefix: process.env.NUXT_PUBLIC_UPLOAD_PREFIX || 'uploads',
+      themeVars: {} as Record<string, string>,
     },
   },
 })
