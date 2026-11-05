@@ -154,7 +154,7 @@ export interface NotificationEmailContent {
   text: string
 }
 
-const FOOTER_REASON = 'You\'re receiving this because of your activity on this FeedLog board. To stop these emails, open the post and click Unsubscribe.'
+const FOOTER_REASON = 'You\'re receiving this because of your activity on this FeedLog board.'
 const ADMIN_FOOTER_REASON = 'You\'re receiving this because you manage this FeedLog board.'
 
 // Gray page → centered FeedLog wordmark → white rounded card → centered footer.
