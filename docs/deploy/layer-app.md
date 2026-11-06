@@ -12,6 +12,7 @@ colours, your own fonts or changed wording.
 
 ```
 acme-desk/
+  package.json            { "name": "acme-desk", "private": true, "type": "module" }
   nuxt.config.ts          site name, your CSS file, the language list
   wrangler.toml           the full Worker config (name, route, bindings, vars)
   app/assets/brand.css    colours, fonts, corner sizes
@@ -31,6 +32,9 @@ export default defineNuxtConfig({
   i18n: { locales: [{ code: 'en', file: 'en.json' }, { code: 'zh', file: 'zh.json' }] },
 })
 ```
+
+Keep `layers/`, `node_modules`, `.nuxt/`, `.output/`, `.data/`, `.wrangler/` and
+`eslint.config.mjs` out of git: the build creates them.
 
 Nuxt finds `layers/feedlog` by itself. Start `wrangler.toml` from the one in
 this repository and set your own values. Secrets stay Worker secrets
@@ -53,7 +57,7 @@ copies the database migrations into the output. Every key of your
 
 | What | How |
 |---|---|
-| Colours | Set the theme variables in your CSS, with more weight than FeedLog's: `:root:root { --background: #fffdf7; --border: #e6dcc8; }`. The primary colour comes from Settings → Branding. |
+| Colours | Set the theme variables in your CSS with three selectors, because FeedLog injects its own colours with two: `:root:root:not(.dark) { --background: #fffdf7; --border: #e6dcc8; }` changes the light theme and leaves the dark one whole. |
 | Corner sizes | `:root { --theme-radius-sm: 2px; --theme-radius-md: 4px; --theme-radius-lg: 8px; --theme-radius-xl: 12px; }` |
 | Fonts | `body, .font-body { font-family: 'Outfit', sans-serif; }` and `h1, h2, h3, h4, h5, h6, .font-heading { font-family: 'Fraunces', serif; }` |
 | Any UI string | The same key in `i18n/locales/<lang>.json`. Your file holds only the keys you change. |
