@@ -241,6 +241,8 @@ export default defineNuxtConfig({
       widgetGreetings: {} as Record<string, string>,
       uploadPrefix: process.env.NUXT_PUBLIC_UPLOAD_PREFIX || 'uploads',
       themeVars: {} as Record<string, string>,
+
+      agentName: '',
     },
   },
 })
