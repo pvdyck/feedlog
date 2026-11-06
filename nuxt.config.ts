@@ -235,6 +235,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       dashboardLoginOnly: false,
+      widgetGreetings: {} as Record<string, string>,
       uploadPrefix: process.env.NUXT_PUBLIC_UPLOAD_PREFIX || 'uploads',
     },
   },
