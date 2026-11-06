@@ -197,6 +197,9 @@ export default defineNuxtConfig({
   },
 
   nitro: {
+    // Built page chunks are complete. Under an app that extends this layer, the
+    // server auto-import pass adds a second copy of a symbol to them.
+    imports: { exclude: [/[\\/]\.nuxt[\\/]dist[\\/]/] },
     externals: {
       traceInclude: mastraTraceInclude,
       traceAlias: mastraTraceAlias,
