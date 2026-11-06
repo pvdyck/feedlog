@@ -33,10 +33,10 @@ export default defineNitroPlugin(() => {
     if (!emailFrom) throw new Error('EMAIL_FROM required for the cloudflare email provider')
     registerEmailProvider({
       name: 'cloudflare',
-      send: async ({ to, subject, html, text, headers }) => {
+      send: async ({ to, subject, html, text, headers, fromName }) => {
         const binding = (globalThis as typeof globalThis & { __env__?: { EMAIL?: { send(message: object): Promise<{ messageId: string }> } } }).__env__?.EMAIL
         if (!binding) throw new Error('EMAIL binding missing')
-        const { messageId } = await binding.send({ from: { email: emailFrom, name: FROM_DISPLAY_NAME }, to, subject, html, text, headers })
+        const { messageId } = await binding.send({ from: { email: emailFrom, name: fromName ?? 'FeedLog' }, to, subject, html, text, headers })
         logger.info(`Email sent via Cloudflare id=${messageId}`)
       },
     })
