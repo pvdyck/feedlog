@@ -1,6 +1,15 @@
 import { isWidgetTranslation, resolveWidgetLocale, widgetLocaleRequest } from '#layers/feedlog/shared/utils/widget-locale'
 import type { WidgetLanguage } from '#layers/feedlog/shared/utils/widget-locale'
+import { mergeWidgetMessages } from '#layers/feedlog/shared/utils/widget-messages'
 import type { Ref } from 'vue'
+
+// This layer's translations, and the app root's overrides of single strings. In a
+// plain build both name the same files.
+type MessageFiles = Record<string, () => Promise<{ default: Record<string, unknown> }>>
+const layerFiles: MessageFiles = import.meta.glob('../../i18n/widget/*.json')
+const rootFiles: MessageFiles = import.meta.glob('~~/i18n/widget/*.json')
+const load = async (files: MessageFiles, language: string) =>
+  (await Object.entries(files).find(([path]) => path.endsWith(`/${language}.json`))?.[1]())?.default
 
 export function useWidgetLocale(override: Ref<WidgetLanguage | undefined>) {
   const route = useRoute()
@@ -14,8 +23,8 @@ export function useWidgetLocale(override: Ref<WidgetLanguage | undefined>) {
     const language = resolveWidgetLocale(request.value, navigator.languages?.length ? navigator.languages : [navigator.language])
     if (isWidgetTranslation(language)) {
       await loadLocaleMessages('en')
-      const messages = await import(`../../i18n/widget/${language}.json`)
-      setLocaleMessage(language, messages.default)
+      const [layer, root] = await Promise.all([load(layerFiles, language), load(rootFiles, language)])
+      setLocaleMessage(language, mergeWidgetMessages(layer ?? {}, root))
     }
     else await loadLocaleMessages(language)
     // A slower language download must not overwrite a newer host instruction.

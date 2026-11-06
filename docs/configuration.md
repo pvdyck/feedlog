@@ -388,8 +388,14 @@ intended email — fine for development, not for production.
 
 ### `EMAIL_PROVIDER` &nbsp;⬜ optional
 
-Provider identifier. Currently supported: `resend`. Leave unset to use
-the console-logging fallback.
+Provider identifier. Currently supported: `resend` and `cloudflare`. Leave
+unset to use the console-logging fallback.
+
+`cloudflare` sends through Cloudflare Email Sending, with the Worker's
+`send_email` binding named `EMAIL`. It works on Cloudflare Workers only and
+needs `EMAIL_FROM`. Like a Resend key, it turns on sign-up email verification
+by default (override with `AUTH_EMAIL_VERIFY`). See
+[Deploying to Cloudflare Workers](deploy/cloudflare-workers.md).
 
 ### `RESEND_API_KEY` &nbsp;⬜ optional
 
@@ -427,9 +433,6 @@ The domain must be verified with your email provider.
   `RESEND_API_KEY`) are set via `wrangler secret put <NAME>` and are
   never committed to the repo.
 
-`HYPERDRIVE_PREPARE=true` uses prepared statements through Hyperdrive. Cloudflare
-warns that postgres.js with `prepare: false` can hang. Unset keeps `prepare: false`.
-
 ### Vercel
 
 - Inbox requires Vercel Queues for delayed tasks. The build configures the
@@ -450,6 +453,9 @@ warns that postgres.js with `prepare: false` can hang. Unset keeps `prepare: fal
   `/app/.data` so the local-filesystem fallback survives restarts.
 
 ### `AGENT_MAX_STEPS` &nbsp;⬜ optional, default `12`
+
+Accepts a positive safe integer written in decimal digits (surrounding whitespace is ignored).
+Unset or invalid values silently fall back to `12`.
 
 The most model steps in one Widget Agent run. A lower value limits cost and time, but a run that
 reaches it may end before it answers, so test it on your own help content.

@@ -15,10 +15,10 @@ const props = defineProps<{
 const emit = defineEmits<{ authRequired: []; filed: []; replied: [id: string, lastSeq: number]; started: [id: string]; busy: [value: boolean]; stateChange: [state: WidgetChatResume] }>()
 const { t, locale } = useI18n()
 const messageTime = useConversationTime()
-const agentName = useRuntimeConfig().public.agentName || t('widget.messageAI')
-const messageAuthor = (item: Item) => item.authorType === 'customer' ? t('widget.messageYou') : item.authorType === 'agent' ? agentName : item.author?.name ? t('widget.messageStaffNamed', { name: item.author.name }) : t('widget.messageStaff')
 const { widgetGreetings } = useRuntimeConfig().public
 const greeting = computed(() => widgetGreetings[locale.value]?.replace('{product}', props.productName) ?? t('widget.greeting', { product: props.productName }))
+const agentName = useRuntimeConfig().public.agentName || t('widget.messageAI')
+const messageAuthor = (item: Item) => item.authorType === 'customer' ? t('widget.messageYou') : item.authorType === 'agent' ? agentName : item.author?.name ? t('widget.messageStaffNamed', { name: item.author.name }) : t('widget.messageStaff')
 const { user, widgetFetch, widgetRequest, ensureIdentity, imageMaxBytes } = inject(widgetEmbedKey)!
 const protocol = inject(widgetProtocolKey, null)
 const apiBase = '/api/widget/conversations'

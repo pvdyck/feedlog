@@ -29,3 +29,10 @@ test('widget translations need an explicit locale, so auto keeps its behaviour',
   }
   assert.equal(resolveWidgetLocale('auto', ['fr-FR', 'de-DE']), 'en')
 })
+
+test('a translation needs an explicit host locale, and a regional tag gives its base language', () => {
+  assert.equal(resolveWidgetLocale('auto', ['de-DE', 'fr-FR']), 'en')
+  assert.equal(resolveWidgetLocale('pt-BR', ['en']), 'pt')
+  assert.equal(resolveWidgetLocale('de-AT', ['en']), 'de')
+  assert.equal(resolveWidgetLocale('ko-KR', ['en']), 'en')
+})
