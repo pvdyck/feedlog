@@ -39,6 +39,12 @@ export function resolveEmailProvider(): EmailProvider {
   throw new Error('No email provider registered')
 }
 
+// A provider that delivers: a Resend key, or the Cloudflare binding provider.
+// The console fallback does not count.
+export function hasEmailTransport(env: Record<string, string | undefined> = process.env): boolean {
+  return !!env.RESEND_API_KEY || env.EMAIL_PROVIDER === 'cloudflare'
+}
+
 // The From header of a provider that takes one string. A given name is quoted
 // and loses quotes and line breaks, so an organization name cannot add headers.
 export function formatSender(address: string, name?: string): string {
