@@ -72,4 +72,6 @@ copies the database migrations into the output. Every key of your
 
 1. Compare `layers/feedlog/wrangler.toml` between the two commits and take over new bindings.
 2. Check `layers/feedlog/server/db/migrations` for new files, and apply them (see [Cloudflare Workers](./cloudflare-workers.md)).
-3. Build, then deploy.
+3. Build.
+4. Check that your overrides are in the build: search `.output/public/_nuxt` for one string from each of your `i18n/locales` and `i18n/widget` files. A newer Nuxt can change how the app root is found, and a lost override gives no error.
+5. Deploy.
