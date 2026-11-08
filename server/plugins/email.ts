@@ -2,7 +2,6 @@ import { consola } from 'consola'
 
 const logger = consola.withTag('email')
 
-const FROM_DISPLAY_NAME = 'FeedLog'
 const FALLBACK_FROM_ADDRESS = 'onboarding@resend.dev'
 
 export default defineNitroPlugin(() => {
@@ -12,11 +11,10 @@ export default defineNitroPlugin(() => {
   // Resend — register when API key is available
   if (resendApiKey) {
     const fromAddress = emailFrom || FALLBACK_FROM_ADDRESS
-    const from = `${FROM_DISPLAY_NAME} <${fromAddress}>`
-
     registerEmailProvider({
       name: 'resend',
-      send: async ({ to, subject, html, text, headers, idempotencyKey }) => {
+      send: async ({ to, subject, html, text, headers, idempotencyKey, fromName }) => {
+        const from = formatSender(fromAddress, fromName)
         const response = await $fetch<{ id: string }>('https://api.resend.com/emails', {
           method: 'POST',
           headers: { Authorization: `Bearer ${resendApiKey}`, ...(idempotencyKey ? { 'Idempotency-Key': idempotencyKey } : {}) },
@@ -27,7 +25,21 @@ export default defineNitroPlugin(() => {
         logger.info(`Email sent via Resend to=${to} id=${response.id}`)
       },
     })
-    logger.info(`Registered email provider: resend (from=${from})`)
+    logger.info(`Registered email provider: resend (from=${fromAddress})`)
+  }
+
+  // Cloudflare Email Sending, through the Worker's send_email binding.
+  if (process.env.EMAIL_PROVIDER === 'cloudflare') {
+    if (!emailFrom) throw new Error('EMAIL_FROM required for the cloudflare email provider')
+    registerEmailProvider({
+      name: 'cloudflare',
+      send: async ({ to, subject, html, text, headers, fromName }) => {
+        const binding = (globalThis as typeof globalThis & { __env__?: { EMAIL?: { send(message: object): Promise<{ messageId: string }> } } }).__env__?.EMAIL
+        if (!binding) throw new Error('EMAIL binding missing')
+        const { messageId } = await binding.send({ from: { email: emailFrom, name: fromName ?? 'FeedLog' }, to, subject, html, text, headers })
+        logger.info(`Email sent via Cloudflare id=${messageId}`)
+      },
+    })
   }
 
   // Console — always registered as fallback for development
