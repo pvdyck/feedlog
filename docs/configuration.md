@@ -327,13 +327,7 @@ back to the host product page.
 
 The SDK `locale` option selects `en`, `zh`, `de`, `es`, `fr`, `it` or `pt`. The last five cover the widget only, and only when a host asks for them: `auto` keeps resolving to English or Chinese.
 
-### `NUXT_PUBLIC_WIDGET_GREETINGS` &nbsp;⬜ optional
-
-JSON map of the widget's first message per language. `{product}` is the organization name. A language with no entry keeps the default text.
-
-```bash
-NUXT_PUBLIC_WIDGET_GREETINGS='{"en":"Hi from {product}","fr":"Salut de {product}"}'
-```
+A project that builds FeedLog as a layer changes any widget string, the greeting included, in its own `i18n/widget/<lang>.json` or `i18n/locales/<lang>.json`.
 
 ---
 
