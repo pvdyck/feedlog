@@ -158,19 +158,6 @@ sign in. Create the first admin before you set it.
 
 ---
 
-## Theme
-
-### `NUXT_PUBLIC_THEME_VARS` &nbsp;⬜ optional
-
-JSON map of CSS variables for the light theme, applied over the brand colour. Dark mode
-keeps its own palette.
-
-```bash
-NUXT_PUBLIC_THEME_VARS='{"--background":"#ffffff","--border":"#dddddd"}'
-```
-
----
-
 ## Blob storage
 
 File uploads on feedback posts need a blob backend. The choice depends on
@@ -254,10 +241,6 @@ entirely — the rest of the app works without them.
 ### `OPENAI_API_KEY` &nbsp;⬜ optional
 
 API key for the LLM provider.
-
-### `NUXT_PUBLIC_AGENT_NAME` &nbsp;⬜ optional, default `FeedLog AI`
-
-The name shown on Widget Agent replies.
 
 ### `OPENAI_BASE_URL` &nbsp;⬜ optional, default `https://api.openai.com/v1`
 
@@ -358,25 +341,13 @@ missing page details do not prevent sending a message. Context stores the HTTP(S
 origin and pathname, never query parameters or fragments, so reply emails can link
 back to the host product page.
 
-### `OPENAI_TOOL_CALL_EMPTY_CONTENT` &nbsp;⬜ optional, default `false`
-
-Set `true` if the provider rejects an assistant tool-call message with `content: null`.
-The Widget Agent then sends an empty string. Cloudflare Workers AI needs this for models
-such as `@cf/openai/gpt-oss-120b`.
-
 ---
 
 ## Widget languages
 
 The SDK `locale` option selects `en`, `zh`, `de`, `es`, `fr`, `it` or `pt`. The last five cover the widget only, and only when a host asks for them: `auto` keeps resolving to English or Chinese.
 
-### `NUXT_PUBLIC_WIDGET_GREETINGS` &nbsp;⬜ optional
-
-JSON map of the widget's first message per language. `{product}` is the organization name. A language with no entry keeps the default text.
-
-```bash
-NUXT_PUBLIC_WIDGET_GREETINGS='{"en":"Hi from {product}","fr":"Salut de {product}"}'
-```
+A project that builds FeedLog as a layer changes any widget string, the greeting included, in its own `i18n/widget/<lang>.json` or `i18n/locales/<lang>.json`.
 
 ---
 

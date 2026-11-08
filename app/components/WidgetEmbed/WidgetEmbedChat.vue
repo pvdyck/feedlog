@@ -13,12 +13,9 @@ const props = defineProps<{
   productName: string; openId: string | null; resumeState?: WidgetChatResume | null
 }>()
 const emit = defineEmits<{ authRequired: []; filed: []; replied: [id: string, lastSeq: number]; started: [id: string]; busy: [value: boolean]; stateChange: [state: WidgetChatResume] }>()
-const { t, locale } = useI18n()
+const { t } = useI18n()
 const messageTime = useConversationTime()
-const { widgetGreetings } = useRuntimeConfig().public
-const greeting = computed(() => widgetGreetings[locale.value]?.replace('{product}', props.productName) ?? t('widget.greeting', { product: props.productName }))
-const agentName = useRuntimeConfig().public.agentName || t('widget.messageAI')
-const messageAuthor = (item: Item) => item.authorType === 'customer' ? t('widget.messageYou') : item.authorType === 'agent' ? agentName : item.author?.name ? t('widget.messageStaffNamed', { name: item.author.name }) : t('widget.messageStaff')
+const messageAuthor = (item: Item) => item.authorType === 'customer' ? t('widget.messageYou') : item.authorType === 'agent' ? t('widget.messageAI') : item.author?.name ? t('widget.messageStaffNamed', { name: item.author.name }) : t('widget.messageStaff')
 const { user, widgetFetch, widgetRequest, ensureIdentity, imageMaxBytes } = inject(widgetEmbedKey)!
 const protocol = inject(widgetProtocolKey, null)
 const apiBase = '/api/widget/conversations'
@@ -515,13 +512,13 @@ async function closeArticle() {
   <div v-show="!articleSlug" ref="bodyEl" class="min-h-0 flex-1 overflow-y-auto overscroll-y-contain bg-background p-3.5 space-y-2.5 [overflow-wrap:anywhere]" @scroll="rememberScroll">
     <div v-if="loadingThread" class="grid place-items-center p-4"><Icon name="lucide:loader-2" size="20" class="animate-spin" /></div>
     <button v-if="nextBeforeSeq" class="block mx-auto text-xs text-primary" @click="loadHistory(true)">{{ t('widget.earlierMessages') }}</button>
-    <div v-if="!items.length && !loadingThread" class="max-w-[88%] rounded-lg border bg-card px-3 py-2.5 text-[13.5px]">{{ greeting }}</div>
+    <div v-if="!items.length && !loadingThread" class="max-w-[88%] rounded-lg border bg-card px-3 py-2.5 text-[13.5px]">{{ t('widget.greeting', { product: productName }) }}</div>
     <template v-for="item in items" :key="item.id">
       <div v-if="item.notice === 'handoff'" class="flex justify-start" :data-message-id="item.id" data-author="system">
         <div class="min-w-0 max-w-[82%]">
           <div class="rounded-2xl rounded-bl-sm border border-border bg-card px-3 py-2.5 text-[13.5px] font-normal leading-normal" dir="auto" data-handoff-message>{{ item.customerNotice ?? t(`widget.conversationNotices.${item.handoffNotice ?? 'handoff'}`) }}</div>
           <div class="mt-1.5 flex min-w-0 items-center gap-1 px-1 text-[10px] text-muted-foreground" data-message-meta>
-            <span class="truncate font-semibold text-foreground dark:text-white">{{ agentName }}</span>
+            <span class="truncate font-semibold text-foreground dark:text-white">{{ t('widget.messageAI') }}</span>
             <span aria-hidden="true">·</span>
             <time class="shrink-0" :datetime="item.createdAt">{{ messageTime(item.createdAt) }}</time>
           </div>
