@@ -11,6 +11,7 @@ Choose the guide that matches where you want to run FeedLog:
 | Cloudflare Workers | Serverless edge deploy with Hyperdrive and R2 | [Cloudflare Workers](./deploy/cloudflare-workers.md) |
 | Vercel | Managed Node.js deployment with Vercel Blob | [Vercel](./deploy/vercel.md) |
 | Docker | Full self-hosting on a VPS, NAS, or Docker PaaS | [Docker](./deploy/docker.md) |
+| Your own app on top | FeedLog as a Nuxt layer, with your look, words and Worker config in your repo | [Layer app](./deploy/layer-app.md) |
 
 ## Configuration
 
