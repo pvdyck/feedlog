@@ -2,10 +2,11 @@ import type { InjectionKey } from 'vue'
 import { pageContext, type PageContext } from '#layers/feedlog/shared/agent/content'
 import { isWidgetTranslation, WIDGET_TRANSLATIONS } from '#layers/feedlog/shared/utils/widget-locale'
 import type { WidgetLanguage } from '#layers/feedlog/shared/utils/widget-locale'
+import { composeText } from '#layers/feedlog/shared/utils/widget-compose'
 
 const PROTOCOL_VERSION = 1
 
-export type WidgetOutboundType = 'ready' | 'auth-requested' | 'unread' | 'navigate' | 'close-request' | 'page-context-request' | 'resume-state'
+export type WidgetOutboundType = 'ready' | 'auth-requested' | 'unread' | 'navigate' | 'close-request' | 'page-context-request' | 'resume-state' | 'composed'
 
 export function useWidgetProtocol() {
   const route = useRoute()
@@ -17,6 +18,8 @@ export function useWidgetProtocol() {
   // The SDK reduces a tag to en or zh before it sends set-locale, which would undo a
   // translation from the URL. Declining the capability keeps the URL's language.
   const urlTranslation = isWidgetTranslation(String(useRoute().query.locale ?? '').toLowerCase().split('-')[0] ?? '')
+  // The latest host prefill, held until the frame can show it.
+  const compose = ref<{ text: string } | null>(null)
   let captureState: (() => unknown) | undefined
   let restoreState: ((state: unknown) => void) | undefined
 
@@ -62,6 +65,10 @@ export function useWidgetProtocol() {
     else if (type === 'set-locale' && ['en', 'zh', ...WIDGET_TRANSLATIONS].includes(payload?.locale)) {
       locale.value = payload.locale
     }
+    else if (type === 'compose') {
+      const text = composeText(payload)
+      if (text) compose.value = { text }
+    }
   }
 
   function init() {
@@ -101,6 +108,7 @@ export function useWidgetProtocol() {
     embedded,
     theme,
     locale,
+    compose,
     parentOrigin,
     init,
     send,
@@ -117,6 +125,7 @@ export function useWidgetProtocol() {
       else window.open(`/p/${encodeURIComponent(slug)}`, '_blank', 'noopener,noreferrer')
     },
     requestClose: () => send('close-request'),
+    composed: () => send('composed'),
   }
 }
 
