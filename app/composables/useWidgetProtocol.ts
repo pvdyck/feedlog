@@ -1,10 +1,11 @@
 import type { InjectionKey } from 'vue'
 import { pageContext, type PageContext } from '#layers/feedlog/shared/agent/content'
 import type { WidgetLanguage } from '#layers/feedlog/shared/utils/widget-locale'
+import { composeText } from '#layers/feedlog/shared/utils/widget-compose'
 
 const PROTOCOL_VERSION = 1
 
-export type WidgetOutboundType = 'ready' | 'auth-requested' | 'unread' | 'navigate' | 'close-request' | 'page-context-request' | 'resume-state'
+export type WidgetOutboundType = 'ready' | 'auth-requested' | 'unread' | 'navigate' | 'close-request' | 'page-context-request' | 'resume-state' | 'composed'
 
 export function useWidgetProtocol() {
   const route = useRoute()
@@ -13,6 +14,8 @@ export function useWidgetProtocol() {
   const hostOrigin = ref<string | null>(null)
   const theme = ref<'light' | 'dark' | 'auto' | undefined>()
   const locale = ref<WidgetLanguage | undefined>()
+  // The latest host prefill, held until the frame can show it.
+  const compose = ref<{ text: string } | null>(null)
   let captureState: (() => unknown) | undefined
   let restoreState: ((state: unknown) => void) | undefined
 
@@ -58,6 +61,10 @@ export function useWidgetProtocol() {
     else if (type === 'set-locale' && ['en', 'zh'].includes(payload?.locale)) {
       locale.value = payload.locale
     }
+    else if (type === 'compose') {
+      const text = composeText(payload)
+      if (text) compose.value = { text }
+    }
   }
 
   function init() {
@@ -97,6 +104,7 @@ export function useWidgetProtocol() {
     embedded,
     theme,
     locale,
+    compose,
     parentOrigin,
     init,
     send,
@@ -113,6 +121,7 @@ export function useWidgetProtocol() {
       else window.open(`/p/${encodeURIComponent(slug)}`, '_blank', 'noopener,noreferrer')
     },
     requestClose: () => send('close-request'),
+    composed: () => send('composed'),
   }
 }
 

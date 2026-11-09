@@ -256,6 +256,35 @@ function onNewConversation() {
   view.value = 'chat'
 }
 
+// A host prefill starts a new conversation with the text in the composer. The
+// visitor sends it. 'composed' tells the host to stop retrying; the host repeats
+// the same text until then, and a repeat must not start another conversation.
+const settled = ref(false)
+let lastCompose: string | null = null
+let composing = false
+watch([protocol.compose, settled], ([request, ready]) => {
+  if (!request || !ready || status.value === 'anonymous') return
+  protocol.compose.value = null
+  if (request.text === lastCompose) {
+    if (!composing) protocol.composed()
+    return
+  }
+  lastCompose = request.text
+  composing = true
+  onNewConversation()
+  restoredChat.value = { conversationId: null, draft: request.text, pending: null, articleSlug: null, articleScrollTop: 0, firstSeq: null, attachments: [], scrollTop: 0 }
+  const stop = watch(savedChat, (chat) => {
+    if (chat?.conversationId !== null || chat.draft !== request.text) return
+    stop()
+    composing = false
+    restoredChat.value = null
+    const input = widgetRoot.value?.querySelector('textarea')
+    input?.focus()
+    input?.setSelectionRange(input.value.length, input.value.length)
+    protocol.composed()
+  })
+})
+
 function onBack() {
   view.value = 'conversations'
   void loadConversations()
@@ -342,6 +371,7 @@ onMounted(async () => {
 
   // ready last, so the SDK drops its loading state only once this frame has
   // settled into one of its states.
+  settled.value = true
   protocol.ready()
 })
 
