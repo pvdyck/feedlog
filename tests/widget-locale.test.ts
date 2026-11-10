@@ -19,6 +19,20 @@ test('existing Chinese embed paths remain explicit, while an SDK locale override
 
 test('regional language tags use existing Chinese or English text without adding translations', () => {
   for (const tag of ['zh-CN', 'zh-TW', 'zh-Hant', 'ZH-hk']) assert.equal(resolveWidgetLocale(tag, ['en']), 'zh')
-  for (const tag of ['en', 'en-GB', 'en-US', 'fr', 'ko', 'unsupported']) assert.equal(resolveWidgetLocale(tag, ['zh']), 'en')
+  for (const tag of ['en', 'en-GB', 'en-US', 'ko', 'unsupported']) assert.equal(resolveWidgetLocale(tag, ['zh']), 'en')
   assert.equal(resolveWidgetLocale('auto', []), 'en')
+})
+
+test('widget translations need an explicit locale, so auto keeps its behaviour', () => {
+  for (const [tag, language] of [['fr', 'fr'], ['fr-CA', 'fr'], ['de', 'de'], ['es-MX', 'es'], ['it', 'it'], ['pt-BR', 'pt']]) {
+    assert.equal(resolveWidgetLocale(tag!, ['en']), language)
+  }
+  assert.equal(resolveWidgetLocale('auto', ['fr-FR', 'de-DE']), 'en')
+})
+
+test('a translation needs an explicit host locale, and a regional tag gives its base language', () => {
+  assert.equal(resolveWidgetLocale('auto', ['de-DE', 'fr-FR']), 'en')
+  assert.equal(resolveWidgetLocale('pt-BR', ['en']), 'pt')
+  assert.equal(resolveWidgetLocale('de-AT', ['en']), 'de')
+  assert.equal(resolveWidgetLocale('ko-KR', ['en']), 'en')
 })
