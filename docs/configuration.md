@@ -343,6 +343,14 @@ back to the host product page.
 
 ---
 
+## Widget languages
+
+The SDK `locale` option selects `en`, `zh`, `de`, `es`, `fr`, `it` or `pt`. The last five cover the widget only, and only when a host asks for them: `auto` keeps resolving to English or Chinese.
+
+A project that builds FeedLog as a layer changes any widget string, the greeting included, in its own `i18n/widget/<lang>.json` or `i18n/locales/<lang>.json`.
+
+---
+
 ## Transactional email
 
 Used for password-reset emails and (optionally) email verification. When
