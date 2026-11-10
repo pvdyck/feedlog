@@ -160,3 +160,7 @@ requires matching SDK and hosted iframe support. Resume messages validate the
 parent/frame origin and source; a different signed-in account cannot inherit
 the previous account's state. See the [SDK integration guide](https://github.com/linkcraftstudio/feedlog-widget#host-login-lifecycle)
 for examples and compatibility details.
+
+To open a new conversation with prefilled text, post `{ v: 1, type: 'compose', payload: { text } }`
+to the frame after `ready`. The frame puts the text (at most 2000 characters) in the composer without
+sending it, and answers `{ v: 1, type: 'composed' }`. A repeat of the last text only answers again.
