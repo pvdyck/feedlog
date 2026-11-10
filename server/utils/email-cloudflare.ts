@@ -12,10 +12,10 @@ export function cloudflareEmailProvider(emailFrom: string | undefined, binding: 
   if (!emailFrom) throw new Error('EMAIL_FROM required for the cloudflare email provider')
   return {
     name: 'cloudflare',
-    send: async ({ to, subject, html, text, headers }) => {
+    send: async ({ to, subject, html, text, headers, fromName }) => {
       const email = binding()
       if (!email) throw new Error('EMAIL binding missing')
-      const { messageId } = await email.send({ from: { email: emailFrom, name: 'FeedLog' }, to, subject, html, text, headers })
+      const { messageId } = await email.send({ from: { email: emailFrom, name: fromName ?? 'FeedLog' }, to, subject, html, text, headers })
       console.info(`[email] Email sent via Cloudflare id=${messageId}`)
     },
   }

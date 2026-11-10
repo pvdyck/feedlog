@@ -21,3 +21,10 @@ test('a binding error reaches the caller', async () => {
   const binding: SendEmailBinding = { send: async () => { throw failure } }
   await assert.rejects(cloudflareEmailProvider('noreply@example.com', () => binding).send(mail), failure)
 })
+
+test('the provider sends under the given sender name', async () => {
+  const sent: Array<{ from: unknown }> = []
+  const binding: SendEmailBinding = { send: async (message) => { sent.push(message as { from: unknown }); return { messageId: 'm2' } } }
+  await cloudflareEmailProvider('noreply@example.com', () => binding).send({ ...mail, fromName: 'Acme' })
+  assert.deepEqual(sent[0]!.from, { email: 'noreply@example.com', name: 'Acme' })
+})
