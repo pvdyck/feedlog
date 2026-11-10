@@ -341,8 +341,25 @@ intended email — fine for development, not for production.
 
 ### `EMAIL_PROVIDER` &nbsp;⬜ optional
 
-Provider identifier. Currently supported: `resend`. Leave unset to use
-the console-logging fallback.
+Provider identifier. Currently supported: `resend` and `cloudflare`. Leave
+unset to use the console-logging fallback.
+
+`cloudflare` sends through Cloudflare Email Sending, with the Worker's
+`send_email` binding named `EMAIL`. It works on Cloudflare Workers only and
+needs `EMAIL_FROM`. See [Deploying to Cloudflare Workers](deploy/cloudflare-workers.md).
+
+- **Plan.** Sending to any recipient needs the Workers Paid plan. On Workers
+  Free, the binding sends only to the verified destination addresses of the
+  Cloudflare account, so sign-up, invitation and reply emails to other people fail.
+- **Sender domain.** The domain of `EMAIL_FROM` must use Cloudflare DNS and be
+  onboarded in Email Service > Email Sending, which adds its SPF and DKIM records.
+- **Verification.** Like a Resend key, this provider turns on sign-up email
+  verification by default. On Workers Free, set `AUTH_EMAIL_VERIFY=false`, or
+  new accounts cannot confirm their email.
+- **Duplicates.** The binding takes no idempotency key, so delivery is at least
+  once. If Cloudflare accepts a message but the call still fails, an Inbox reply
+  or handoff email that FeedLog retries can arrive twice. Resend deduplicates
+  these retries.
 
 ### `RESEND_API_KEY` &nbsp;⬜ optional
 
@@ -352,14 +369,37 @@ Setting this also auto-enables sign-up email verification (override with
 
 ### `EMAIL_FROM` &nbsp;⬜ optional
 
-Sender address for outbound mail (the display name `FeedLog` is added
-automatically). Example:
+Sender address for outbound mail. The display name comes from the email
+identity below. Example:
 
 ```
 EMAIL_FROM=noreply@yourdomain.com
 ```
 
 The domain must be verified with your email provider.
+
+### Email identity
+
+Each email resolves one name and uses it for the sender, the subject and the body.
+
+- **About one organization's conversation** (an Inbox reply to a customer, a
+  handoff to the team): that organization's name.
+- **Account and site emails** (verification, password reset, password added,
+  invitations, notifications, the queue quota warning): the site name, which is
+  the default organization's name.
+
+While the default organization keeps the name `Default`, account and site emails
+say FeedLog, as before. Once it has its own name, they use that name and leave
+out the FeedLog links, contacts and attribution: the install answers for its own
+emails.
+
+An app that builds FeedLog as a Nuxt layer can set the site name in a server plugin:
+
+```ts
+export default defineNitroPlugin(nitroApp => {
+  nitroApp.hooks.hook('feedlog:email:brand', (brand) => { brand.name = 'Acme' })
+})
+```
 
 ---
 

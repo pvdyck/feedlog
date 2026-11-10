@@ -3,6 +3,7 @@
 
 export interface SendEmailOptions {
   to: string
+  fromName?: string // sender display name, resolved once by the caller; the provider's default without it
   idempotencyKey?: string
   subject: string
   html: string
@@ -35,6 +36,18 @@ export function resolveEmailProvider(): EmailProvider {
   }
 
   throw new Error('No email provider registered')
+}
+
+// A provider that delivers: a Resend key, or the Cloudflare binding provider.
+// The console fallback does not count.
+export function hasEmailTransport(env: Record<string, string | undefined> = process.env): boolean {
+  return !!env.RESEND_API_KEY || env.EMAIL_PROVIDER === 'cloudflare'
+}
+
+// The From header of a provider that takes one string. A given name is quoted
+// and loses quotes and line breaks, so an organization name cannot add headers.
+export function formatSender(address: string, name?: string): string {
+  return `${name ? `"${name.replace(/["\\\r\n]/g, '')}"` : 'FeedLog'} <${address}>`
 }
 
 // `.invalid` is reserved by RFC 2606 and can never resolve. Guest rows and
